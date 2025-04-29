@@ -1,6 +1,7 @@
 # fortune_wheel
 
-A new Flutter project.
+A modern, cross-platform Flutter app for decision making.
+This app is open source and in active development.
 
 ## Getting Started
 

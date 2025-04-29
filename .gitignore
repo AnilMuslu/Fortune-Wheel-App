@@ -21,7 +21,7 @@ migrate_working_dir/
 # The .vscode folder contains launch configuration and tasks you configure in
 # VS Code which you may wish to be included in version control, so this line
 # is commented out by default.
-#.vscode/
+.vscode/
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -32,6 +32,8 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+.packages
+.melos_tool/
 
 # Symbolication related
 app.*.symbols
@@ -43,15 +45,32 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+android/.gradle/
+android/app/key.properties
+
+# local.properties (kişisel sistem ayarı, sakıncalı)
+android/local.properties
 
 # Android keystore (gizli anahtarlar olabilir)
 *.jks
 *.keystore
 
-# local.properties (kişisel sistem ayarı, sakıncalı)
-android/local.properties
+# iOS
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+
+# Xcode
+*.xcworkspace
+*.xcuserdata
+*.xcuserstate
 
 # Firebase ya da özel ayarlar (eğer varsa)
+firebase.json
+*.keystore
+
+*.lock
 *.env
 .env
 
