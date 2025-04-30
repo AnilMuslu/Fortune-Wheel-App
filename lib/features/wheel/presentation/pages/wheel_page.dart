@@ -76,43 +76,6 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddEntryDialog(context);
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  void _showAddEntryDialog(BuildContext context) {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Entry'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Entry name'),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.isNotEmpty) {
-                ref.read(entriesProvider.notifier).addEntry(controller.text);
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Add'),
-          ),
-        ],
-      ),
     );
   }
 }

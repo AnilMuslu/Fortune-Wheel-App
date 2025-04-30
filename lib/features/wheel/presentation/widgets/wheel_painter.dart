@@ -19,44 +19,45 @@ class WheelPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (entries.isEmpty) return;
+  final center = Offset(size.width / 2, size.height / 2);
+  final radius = size.width / 2;
+  final paint = Paint()..style = PaintingStyle.fill;
 
-    final center = size.center(Offset.zero);
-    final radius = min(size.width, size.height) / 2;
-    final sweepAngle = 2 * pi / entries.length;
-    var startAngle = angle;
+  final anglePerEntry = entries.isEmpty ? 2 * pi : 2 * pi / entries.length;
 
-    final paint = Paint()..style = PaintingStyle.fill;
+  for (int i = 0; i < (entries.isEmpty ? 1 : entries.length); i++) {
+    final entry = entries.isEmpty ? Entry("No entries yet") : entries[i];
 
-    for (int i = 0; i < entries.length; i++) {
-      paint.color = colors[i % colors.length];
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepAngle,
-        true,
-        paint,
-      );
+    paint.color = entries.isEmpty
+        ? Colors.grey[300]!  // Gri boş çark rengi
+        : Color((entry.text.hashCode * 0xFFFFFF) | 0xFF000000);
 
-      final textPainter = TextPainter(
-        text: TextSpan(
-          text: entries[i].text,
-          style: const TextStyle(fontSize: 14, color: Colors.white),
-        ),
-        textDirection: TextDirection.ltr,
-      )..layout(maxWidth: radius * 0.7);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      anglePerEntry * i,
+      anglePerEntry,
+      true,
+      paint,
+    );
 
-      final x = center.dx + radius * 0.6 * cos(startAngle + sweepAngle / 2);
-      final y = center.dy + radius * 0.6 * sin(startAngle + sweepAngle / 2);
-      canvas.save();
-      canvas.translate(x, y);
-      canvas.rotate(startAngle + sweepAngle / 2 + pi / 2);
-      textPainter.paint(canvas, Offset(-textPainter.width / 2, -textPainter.height / 2));
-      canvas.restore();
+    // Metin çizimi
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: entry.text,
+        style: const TextStyle(color: Colors.black, fontSize: 12),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout(maxWidth: radius);
 
-      startAngle += sweepAngle;
-    }
+    final angle = anglePerEntry * i + anglePerEntry / 2;
+    final offset = Offset(
+      center.dx + radius / 2 * cos(angle) - textPainter.width / 2,
+      center.dy + radius / 2 * sin(angle) - textPainter.height / 2,
+    );
+
+    textPainter.paint(canvas, offset);
   }
+}
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
