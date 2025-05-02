@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/entry_list.dart';
 import '../widgets/wheel_painter.dart';
 import '../../application/wheel_provider.dart';
+import 'dart:math';
 
 class WheelPage extends ConsumerStatefulWidget {
   const WheelPage({super.key});
@@ -14,6 +15,7 @@ class WheelPage extends ConsumerStatefulWidget {
 class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   double _angle = 0;
+  double _targetAngle = 0;
 
   @override
   void initState() {
@@ -23,7 +25,7 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
       vsync: this,
     )..addListener(() {
         setState(() {
-          _angle = _controller.value * 10 * 3.14; // 5 tur civarı
+          _angle = _controller.value * _targetAngle;
         });
       });
   }
@@ -35,8 +37,22 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
   }
 
   void spinWheel() {
+    final entries = ref.read(entriesProvider);
+    if (entries.isEmpty){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please add at least one entry before spinning.")),
+      );
+      return;
+    } // hiçbir şey yapma
+
+    final random = Random();
+    final newIndex = random.nextInt(entries.length);
+
+    const spins = 5;
+    _targetAngle = 2 * pi * spins + (2 * pi / entries.length) * newIndex;
+
     _controller.reset();
-    _controller.forward();
+    _controller.forward(from: 0.0);
   }
 
   @override
@@ -52,11 +68,6 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
       ),
       body: Column(
         children: [
-          const SizedBox(height: 8),
-          const Text(
-            'Entries',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
           Expanded(
             child: EntryList(),
           ),

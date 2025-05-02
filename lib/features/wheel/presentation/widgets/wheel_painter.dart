@@ -23,15 +23,22 @@ class WheelPainter extends CustomPainter {
   final radius = size.width / 2;
   final paint = Paint()..style = PaintingStyle.fill;
 
+  // Çarkı döndürmek için önce canvas'ı merkeze çevir, sonra döndür
+  canvas.translate(center.dx, center.dy);
+  canvas.rotate(angle); // Burada açı uygulanıyor
+  canvas.translate(-center.dx, -center.dy);
+
   final anglePerEntry = entries.isEmpty ? 2 * pi : 2 * pi / entries.length;
 
   for (int i = 0; i < (entries.isEmpty ? 1 : entries.length); i++) {
     final entry = entries.isEmpty ? Entry("No entries yet") : entries[i];
 
+    // Dilimin rengini belirle
     paint.color = entries.isEmpty
-        ? Colors.grey[300]!  // Gri boş çark rengi
+        ? Colors.grey[300]!
         : Color((entry.text.hashCode * 0xFFFFFF) | 0xFF000000);
 
+    // Dilimi çiz
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       anglePerEntry * i,
@@ -49,13 +56,24 @@ class WheelPainter extends CustomPainter {
       textDirection: TextDirection.ltr,
     )..layout(maxWidth: radius);
 
-    final angle = anglePerEntry * i + anglePerEntry / 2;
-    final offset = Offset(
-      center.dx + radius / 2 * cos(angle) - textPainter.width / 2,
-      center.dy + radius / 2 * sin(angle) - textPainter.height / 2,
-    );
+    final labelAngle = anglePerEntry * i + anglePerEntry / 2;
 
+    /// Metin çiziminden önce canvas durumunu kaydet
+    canvas.save();
+
+    // canvas'ı merkeze taşı, sonra dilim açısına döndür
+    canvas.translate(center.dx, center.dy);
+    canvas.rotate(labelAngle); // metin çizim yönü
+
+    // Metni çizeceğimiz konuma gidip düz bir şekilde çizeriz
+    final offset = Offset(
+      radius / 2 - textPainter.width / 2, // x: merkezin sağında
+      -textPainter.height / 2,            // y: merkez hizasında
+    );
     textPainter.paint(canvas, offset);
+
+    // canvas'ı eski haline döndür
+    canvas.restore();
   }
 }
 
