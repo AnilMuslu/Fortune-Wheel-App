@@ -19,4 +19,13 @@ class EntriesNotifier extends StateNotifier<List<Entry>> {
   void clearEntries() {
     state = [];
   }
+  
+  void editEntry(Entry oldEntry, String newText) {
+    state = state.map((e) {
+      if (e == oldEntry) {
+        return Entry(newText);
+      }
+      return e;
+    }).toList();
+  }
 }

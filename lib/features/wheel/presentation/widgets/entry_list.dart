@@ -64,15 +64,45 @@ class _EntryListState extends ConsumerState<EntryList> {
               ),
               itemBuilder: (context, index) {
                 final entry = entries[index];
-                return ListTile(
-                  leading: IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.redAccent),
-                    onPressed: () {
-                      ref.read(entriesProvider.notifier).removeEntry(entry);
-                    },
-                  ),
-                  title: Text(entry.text),
+                return Row(
+                  children: [
+                    // 🔵 Renkli daire
+                    Container(
+                      width: 16,
+                      height: 16,
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: getColorFromText(entry.text),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+
+                    // 📝 Entry metni (genişleyerek ortada kalacak)
+                    Expanded(
+                      child: Text(
+                        entry.text,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+
+                    // ✏️ Düzenleme butonu
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blueGrey),
+                      onPressed: () {
+                        _showEditEntryDialog(context, entry);
+                      },
+                    ),
+
+                    // 🗑️ Silme butonu
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.blueGrey),
+                      onPressed: () {
+                        ref.read(entriesProvider.notifier).removeEntry(entry);
+                      },
+                    ),
+                  ],
                 );
+
               },
             ),
           ],
@@ -124,5 +154,53 @@ class _EntryListState extends ConsumerState<EntryList> {
         );
       },
     );
-  } 
+  }
+    // Renk üretici yardımcı fonksiyon
+  Color getColorFromText(String text) {
+    return Color((text.hashCode * 0xFFFFFF) | 0xFF000000);
+  }
+  void _showEditEntryDialog(BuildContext context, entry) {
+    final editController = TextEditingController(text: entry.text);
+    final editFocusNode = FocusNode();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Future.delayed(Duration.zero, () {
+              FocusScope.of(context).requestFocus(editFocusNode);
+            });
+
+            return AlertDialog(
+              title: const Text('Edit Entry'),
+              content: TextField(
+                controller: editController,
+                focusNode: editFocusNode,
+                decoration: const InputDecoration(hintText: 'Edit entry'),
+                autofocus: true,
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Cancel'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (editController.text.isNotEmpty) {
+                      ref.read(entriesProvider.notifier).editEntry(entry, editController.text);
+                    }
+                    Navigator.pop(context);
+                  },
+                  child: const Text('Save'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 }
