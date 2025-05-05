@@ -51,59 +51,59 @@ class _EntryListState extends ConsumerState<EntryList> {
             ),
             const SizedBox(height: 8),
 
-            // 🔹 ListView of entries
-            ListView.separated(
-              shrinkWrap: true,
-              itemCount: entries.length,
-              physics: const NeverScrollableScrollPhysics(),
-              separatorBuilder: (context, index) => const Divider(
-                thickness: 1,
-                color: Colors.grey,
-                indent: 8,
-                endIndent: 8,
+            // 🔹 Scrollable ListView of entries
+            Expanded(
+              child:ListView.separated(
+                itemCount: entries.length,
+                physics: const BouncingScrollPhysics(),
+                separatorBuilder: (context, index) => const Divider(
+                  thickness: 1,
+                  color: Colors.grey,
+                  indent: 8,
+                  endIndent: 8,
+                ),
+                itemBuilder: (context, index) {
+                  final entry = entries[index];
+                  return Row(
+                    children: [
+                      // 🔵 Renkli daire
+                      Container(
+                        width: 16,
+                        height: 16,
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        decoration: BoxDecoration(
+                          color: getColorFromText(entry.text),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+
+                      // 📝 Entry metni (genişleyerek ortada kalacak)
+                      Expanded(
+                        child: Text(
+                          entry.text,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+
+                      // ✏️ Düzenleme butonu
+                      IconButton(
+                        icon: const Icon(Icons.edit, color: Colors.blueGrey),
+                        onPressed: () {
+                          _showEditEntryDialog(context, entry);
+                        },
+                      ),
+
+                      // 🗑️ Silme butonu
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.blueGrey),
+                        onPressed: () {
+                          ref.read(entriesProvider.notifier).removeEntry(entry);
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
-              itemBuilder: (context, index) {
-                final entry = entries[index];
-                return Row(
-                  children: [
-                    // 🔵 Renkli daire
-                    Container(
-                      width: 16,
-                      height: 16,
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      decoration: BoxDecoration(
-                        color: getColorFromText(entry.text),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-
-                    // 📝 Entry metni (genişleyerek ortada kalacak)
-                    Expanded(
-                      child: Text(
-                        entry.text,
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ),
-
-                    // ✏️ Düzenleme butonu
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blueGrey),
-                      onPressed: () {
-                        _showEditEntryDialog(context, entry);
-                      },
-                    ),
-
-                    // 🗑️ Silme butonu
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.blueGrey),
-                      onPressed: () {
-                        ref.read(entriesProvider.notifier).removeEntry(entry);
-                      },
-                    ),
-                  ],
-                );
-
-              },
             ),
           ],
         ),
