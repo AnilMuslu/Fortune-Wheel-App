@@ -82,6 +82,7 @@ class _EntryListState extends ConsumerState<EntryList> {
                         child: Text(
                           entry.text,
                           style: const TextStyle(fontSize: 16),
+                          // overflow: TextOverflow.ellipsis, // eğer uzun metin kırpılmak istenirse aktifleştirilebilir
                         ),
                       ),
 
