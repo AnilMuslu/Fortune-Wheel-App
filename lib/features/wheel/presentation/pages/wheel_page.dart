@@ -49,7 +49,10 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
     final newIndex = random.nextInt(entries.length);
 
     const spins = 5;
-    _targetAngle = 2 * pi * spins + (2 * pi / entries.length) * newIndex;
+    final anglePerEntry = 2 * pi / entries.length;
+
+    // Kazanan dilim saat 3 yönüne denk gelsin istiyoruz -> 0 radian (canvas'ın pozisyonuna göre)
+    _targetAngle = spins * 2 * pi + (2 * pi - (anglePerEntry * newIndex + anglePerEntry / 2));
 
     _controller.reset();
     _controller.forward(from: 0.0);
@@ -72,21 +75,54 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
             child: EntryList(),
           ),
           Expanded(
-            child: GestureDetector(
-              onTap: spinWheel,
-              child: CustomPaint(
-                painter: WheelPainter(entries: entries, angle: _angle),
-                child: const Center(
-                  child: Text(
-                    'SPIN',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                GestureDetector(
+                  onTap: spinWheel,
+                  child: CustomPaint(
+                    painter: WheelPainter(entries: entries, angle: _angle),
+                    child: const Center(
+                      child: Text(
+                        'SPIN',
+                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                // Saat 3 yönünde gösterge üçgeni
+                Positioned(
+                  right: 16,
+                  child: CustomPaint(
+                    size: const Size(20, 20),
+                    painter: TrianglePainter(),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+class TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.fill;
+
+    final path = Path();
+    path.moveTo(0, size.height / 2);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
