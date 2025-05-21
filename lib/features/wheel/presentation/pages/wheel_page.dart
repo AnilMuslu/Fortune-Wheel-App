@@ -14,6 +14,7 @@ class WheelPage extends ConsumerStatefulWidget {
 
 class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _animation;
   double _angle = 0;
   double _targetAngle = 0;
 
@@ -21,19 +22,15 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 5),
       vsync: this,
-    )..addListener(() {
-        setState(() {
-          _angle = _controller.value * _targetAngle;
-        });
-      });
+    );
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    super.dispose();
+    super.dispose();  
   }
 
   void spinWheel() {
@@ -55,6 +52,22 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
     _targetAngle = spins * 2 * pi + (2 * pi - (anglePerEntry * newIndex + anglePerEntry / 2));
 
     _controller.reset();
+    
+    final curvedAnimation = CurvedAnimation(
+      parent: _controller, 
+      curve: Curves.easeOutCubic, // Daha yumuşak duruş için easeOutCubic
+    );
+
+    _animation = Tween<double>(
+      begin: _angle,
+      end: _targetAngle,
+    ).animate(curvedAnimation)
+      ..addListener((){
+        setState(() {
+          _angle = _animation.value;
+        });
+      });
+
     _controller.forward(from: 0.0);
   }
 
