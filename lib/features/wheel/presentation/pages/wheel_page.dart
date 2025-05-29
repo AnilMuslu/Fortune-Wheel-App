@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/entry_list.dart';
-import '../widgets/wheel_painter.dart';
 import '../../application/wheel_provider.dart';
 import 'dart:math';
+import '../widgets/wheel_canvas.dart';
 
 class WheelPage extends ConsumerStatefulWidget {
   const WheelPage({super.key});
@@ -73,7 +73,6 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final entries = ref.watch(entriesProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -84,58 +83,16 @@ class _WheelPageState extends ConsumerState<WheelPage> with SingleTickerProvider
       ),
       body: Column(
         children: [
+          Expanded(child: EntryList()),
+
           Expanded(
-            child: EntryList(),
-          ),
-          Expanded(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                GestureDetector(
-                  onTap: spinWheel,
-                  child: CustomPaint(
-                    painter: WheelPainter(entries: entries, angle: _angle),
-                    child: const Center(
-                      child: Text(
-                        'SPIN',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ),
-                // Saat 3 yönünde gösterge üçgeni
-                Positioned(
-                  right: 16,
-                  child: CustomPaint(
-                    size: const Size(20, 20),
-                    painter: TrianglePainter(),
-                  ),
-                ),
-              ],
+            child: WheelCanvas(
+              angle: _angle,
+              onSpin: spinWheel,
             ),
           ),
         ],
       ),
     );
   }
-}
-
-class TrianglePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.fill;
-
-    final path = Path();
-    path.moveTo(0, size.height / 2);
-    path.lineTo(size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.close();
-
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
